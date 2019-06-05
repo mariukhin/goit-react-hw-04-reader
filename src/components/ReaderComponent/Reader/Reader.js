@@ -4,7 +4,7 @@ import Publication from '../Publication/Publication';
 import Counter from '../Counter/Counter';
 import Controls from '../Controls/Controls';
 import styles from './Reader.module.css';
-import getIndex from '../../../services/helper';
+import { getIndex, getItemFromProps } from '../../../services/helper';
 import items from '../../../assets/publications.json';
 
 export default class Reader extends Component {
@@ -12,14 +12,35 @@ export default class Reader extends Component {
     activeIndex: 1,
   };
 
-  onPublicationChange = () => {
-    const { history, location } = this.props;
-    const queryParams = queryString.parse(location.search);
+  componentDidMount(){
+    const { history } = this.props;
     const { activeIndex } = this.state;
+    const item = getItemFromProps(this.props);
+    if(!item){
+      return history.replace({
+        pathname: '/reader',
+        search: `?item=${1}`,
+      })
+    }
     history.push({
       pathname: '/reader',
-      search: `?item=${activeIndex + 1}`,
+      search: `?item=${activeIndex}`,
     });
+  };
+
+  onPublicationChange = name  => {
+    const { history, location } = this.props;
+    if (name === 'backBtn'){
+      history.push({
+        pathname: '/reader',
+        search: `?item=${Number(getItemFromProps(this.props)) - 1}`,
+      });
+    }else{
+      history.push({
+        pathname: '/reader',
+        search: `?item=${Number(getItemFromProps(this.props)) + 1}`,
+      });
+    }
   };
 
   handleButton = ({ target: { name } }) => {
@@ -30,22 +51,19 @@ export default class Reader extends Component {
     if (name === 'backBtn') {
       if (index - 1 === indexMin) {
         this.setState({ activeIndex: indexMin + 2 });
-        this.onPublicationChange();
       }
       this.setState(state => ({
         activeIndex: state.activeIndex - 1,
       }));
-      this.onPublicationChange();
     } else {
       if (index + 1 === indexMax - 1) {
         this.setState({ activeIndex: indexMax - 1 });
-        this.onPublicationChange();
       }
       this.setState(state => ({
         activeIndex: state.activeIndex + 1,
       }));
-      this.onPublicationChange();
     }
+    this.onPublicationChange(name);
   };
 
   render() {

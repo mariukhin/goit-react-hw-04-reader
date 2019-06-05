@@ -4,11 +4,10 @@ import Reader from './ReaderComponent/Reader/Reader';
 
 const App = () => (
   <div>
-    <Route path="/" component={Reader} />
-    {/* <Route path="/pets/:id" component={AsyncPetPage} />
-      <Route path="/pets" component={AsyncPetsPage} />
-      <Route path="/about" component={AsyncAboutPage} />
-      <Redirect to="/" /> */}
+    <Switch>
+      <Route path="/" component={Reader} />
+      <Redirect to="/reader" />
+    </Switch>
   </div>
 );
 export default App;
