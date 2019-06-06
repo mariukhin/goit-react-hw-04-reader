@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import queryString from 'query-string';
+import PropTypes from 'prop-types';
 import Publication from '../Publication/Publication';
 import Counter from '../Counter/Counter';
 import Controls from '../Controls/Controls';
@@ -12,30 +12,35 @@ export default class Reader extends Component {
     activeIndex: 1,
   };
 
-  componentDidMount(){
+  static propTypes = {
+    history: PropTypes.shape.isRequired,
+  };
+
+  // eslint-disable-next-line consistent-return
+  componentDidMount() {
     const { history } = this.props;
     const { activeIndex } = this.state;
     const item = getItemFromProps(this.props);
-    if(!item){
+    if (!item) {
       return history.replace({
         pathname: '/reader',
         search: `?item=${1}`,
-      })
+      });
     }
     history.push({
       pathname: '/reader',
       search: `?item=${activeIndex}`,
     });
-  };
+  }
 
-  onPublicationChange = name  => {
-    const { history, location } = this.props;
-    if (name === 'backBtn'){
+  onPublicationChange = name => {
+    const { history } = this.props;
+    if (name === 'backBtn') {
       history.push({
         pathname: '/reader',
         search: `?item=${Number(getItemFromProps(this.props)) - 1}`,
       });
-    }else{
+    } else {
       history.push({
         pathname: '/reader',
         search: `?item=${Number(getItemFromProps(this.props)) + 1}`,
