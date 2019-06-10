@@ -4,82 +4,67 @@ import Publication from '../Publication/Publication';
 import Counter from '../Counter/Counter';
 import Controls from '../Controls/Controls';
 import styles from './Reader.module.css';
-import { getIndex, getItemFromProps } from '../../../services/helper';
+import { getItemFromProps } from '../../../services/helper';
 import items from '../../../assets/publications.json';
 
 export default class Reader extends Component {
-  state = {
-    activeIndex: 1,
-  };
+  state = {};
 
   static propTypes = {
     history: PropTypes.shape.isRequired,
+    location: PropTypes.shape.isRequired,
   };
 
   // eslint-disable-next-line consistent-return
   componentDidMount() {
-    const { history } = this.props;
-    const { activeIndex } = this.state;
+    const { history, location } = this.props;
     const item = getItemFromProps(this.props);
-    if (!item) {
+    if (!item || Number(item) > items.length + 1) {
       return history.replace({
-        pathname: '/reader',
-        search: `?item=${1}`,
+        pathname: location.pathname,
+        search: `item=1`,
       });
     }
-    history.push({
-      pathname: '/reader',
-      search: `?item=${activeIndex}`,
-    });
   }
 
-  onPublicationChange = name => {
+  componentDidUpdate() {
     const { history } = this.props;
-    if (name === 'backBtn') {
-      history.push({
-        pathname: '/reader',
-        search: `?item=${Number(getItemFromProps(this.props)) - 1}`,
-      });
-    } else {
-      history.push({
-        pathname: '/reader',
-        search: `?item=${Number(getItemFromProps(this.props)) + 1}`,
-      });
+    const item = getItemFromProps(this.props);
+    if (!item || Number(item) > items.length + 1) {
+      history.push('/reader?item=1');
     }
+  }
+
+  updateHistory = index => {
+    const { history, location } = this.props;
+    history.push({
+      ...location,
+      search: `item=${index}`,
+    });
   };
 
   handleButton = ({ target: { name } }) => {
-    const { activeIndex } = this.state;
-    const indexMin = 0;
-    const indexMax = items.length;
-    const index = getIndex(items, items[activeIndex - 1]);
-    if (name === 'backBtn') {
-      if (index - 1 === indexMin) {
-        this.setState({ activeIndex: indexMin + 2 });
-      }
-      this.setState(state => ({
-        activeIndex: state.activeIndex - 1,
-      }));
-    } else {
-      if (index + 1 === indexMax - 1) {
-        this.setState({ activeIndex: indexMax - 1 });
-      }
-      this.setState(state => ({
-        activeIndex: state.activeIndex + 1,
-      }));
-    }
-    this.onPublicationChange(name);
+    return name === 'backBtn'
+      ? this.updateHistory(Number(getItemFromProps(this.props)) - 1)
+      : this.updateHistory(Number(getItemFromProps(this.props)) + 1);
   };
 
   render() {
-    const { activeIndex } = this.state;
+    const item = getItemFromProps(this.props);
     const indexMax = items.length;
 
     return (
       <div className={styles.reader}>
-        <Publication item={items[activeIndex - 1]} />
-        <Counter activeIndex={activeIndex} itemTotal={indexMax} />
-        <Controls onButtonClick={this.handleButton} disabled={activeIndex} />
+        {Number(item) <= items.length + 1 && (
+          <>
+            <Publication item={items[Number(item) - 1]} />
+            <Counter activeIndex={Number(item)} itemTotal={indexMax} />
+            <Controls
+              onButtonClick={this.handleButton}
+              disabled={Number(item)}
+            />
+          </>
+        )}
       </div>
     );
   }

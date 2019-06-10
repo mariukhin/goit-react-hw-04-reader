@@ -5,7 +5,7 @@ import Reader from './ReaderComponent/Reader/Reader';
 const App = () => (
   <div>
     <Switch>
-      <Route path="/" component={Reader} />
+      <Route path="/reader" component={Reader} />
       <Redirect to="/reader" />
     </Switch>
   </div>
