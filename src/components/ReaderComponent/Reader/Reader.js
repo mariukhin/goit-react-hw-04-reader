@@ -11,8 +11,8 @@ export default class Reader extends Component {
   state = {};
 
   static propTypes = {
-    history: PropTypes.shape.isRequired,
-    location: PropTypes.shape.isRequired,
+    history: PropTypes.shape(PropTypes.string.isRequired).isRequired,
+    location: PropTypes.shape(PropTypes.string.isRequired).isRequired,
   };
 
   // eslint-disable-next-line consistent-return
